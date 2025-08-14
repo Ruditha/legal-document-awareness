@@ -1,0 +1,36 @@
+# Gitignore for the overall monorepo structure
+
+# Frontend (React Native) specific ignores
+/frontend/node_modules
+/frontend/.expo/
+/frontend/.expo-shared/
+/frontend/.idea/
+/frontend/.vscode/
+/frontend/.DS_Store
+/frontend/.env
+/frontend/android/ # If you ever eject to bare workflow locally
+/frontend/ios/    # If you ever eject to bare workflow locally
+/frontend/npm-debug.log*
+/frontend/*.log
+/frontend/*.tmp
+/frontend/*.temp
+
+# Backend (Python/FastAPI) specific ignores
+/backend/__pycache__/
+/backend/.pytest_cache/
+/backend/venv/ # Python virtual environment (if named 'venv')
+/backend/.venv/ # Python virtual environment (if named '.venv')
+/backend/*.log
+/backend/*.sqlite3 # If you use SQLite for DB
+/backend/*.db
+/backend/.env
+/backend/temp_*.jpg
+/backend/temp_*.png
+/backend/audio_cache/
+
+# Common ignores (e.g., system-generated files)
+.DS_Store
+.env # If you have a .env at the root
+*.log
+*.tmp
+*.temp
