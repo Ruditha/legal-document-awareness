@@ -109,13 +109,20 @@ export default function App() {
     // formData.append('target_language', selectedLanguage); 
 
     try {
-      const response = await fetch(`${backendUrl}/process_document`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          // 'Authorization': 'Basic ' + btoa('user:password'), // Uncomment for basic auth if enabled in main.py
-        },
-      });
+      // First, try a quick health check
+      let response;
+      try {
+        response = await fetch(`${backendUrl}/process_document`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            // 'Authorization': 'Basic ' + btoa('user:password'), // Uncomment for basic auth if enabled in main.py
+          },
+        });
+      } catch (fetchError) {
+        // If fetch itself fails, immediately go to demo mode
+        throw new Error('NETWORK_ERROR');
+      }
 
       if (!response.ok) {
         const errorData = await response.json();
