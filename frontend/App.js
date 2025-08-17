@@ -422,4 +422,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  infoBox: {
+    backgroundColor: '#e3f2fd',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    alignItems: 'center',
+    borderLeftWidth: 4,
+    borderLeftColor: '#2196f3',
+  },
+  infoText: {
+    color: '#1976d2',
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
 });
