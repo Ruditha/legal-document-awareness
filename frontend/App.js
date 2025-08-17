@@ -19,6 +19,19 @@ export default function App() {
   // - For iOS simulator/device: 'http://localhost:8000' (if running on same machine)
   // - For physical Android device on same Wi-Fi: 'http://YOUR_LOCAL_IP_ADDRESS:8000'
   const backendUrl = 'http://localhost:8000';
+
+  // Check backend connectivity
+  const checkBackendHealth = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/health`, {
+        method: 'GET',
+        timeout: 5000,
+      });
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  };
   // Request camera and media library permissions
   const requestPermissions = async () => {
     if (Platform.OS !== 'web') {
