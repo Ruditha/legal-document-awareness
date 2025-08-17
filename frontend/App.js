@@ -12,6 +12,7 @@ export default function App() {
   const [summary, setSummary] = useState('');
   const [keyPoints, setKeyPoints] = useState([]); // This will be a list of strings
   const [imageUri, setImageUri] = useState(null); // To display selected image
+  const [isDemoMode, setIsDemoMode] = useState(false); // Track if we're in demo mode
 
   // Adjust backendUrl based on your setup:
   // - For Android emulator: 'http://10.0.2.2:8000' (connects to host's localhost)
