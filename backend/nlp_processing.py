@@ -99,14 +99,15 @@ def summarize_document(text: str) -> str:
         except Exception as e:
             print(f"LLM summarization failed, using local fallback: {e}")
 
-    # Fallback to local BART model
+    # Fallback to enhanced rule-based summary for testing
     try:
+        # Try local BART model if available
         summary = summarizer(text, max_length=250, min_length=50, do_sample=False)
         return summary[0]['summary_text']
     except Exception as e:
-        print(f"Error during local summarization: {e}")
-        # Final fallback to text truncation
-        return " ".join(text.split()[:150]) + "..."
+        print(f"Local model unavailable, using enhanced fallback: {e}")
+        # Enhanced fallback with better legal document analysis
+        return _create_enhanced_summary(text)
 
 
 def highlight_key_points(text: str) -> List[Dict]:
