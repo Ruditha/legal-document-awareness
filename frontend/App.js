@@ -139,11 +139,13 @@ export default function App() {
       // Check if this is a network error (backend not running)
       // Handle various types of network errors
       const isNetworkError =
+        error.message === 'NETWORK_ERROR' ||
         error.message === 'Failed to fetch' ||
         error.name === 'TypeError' ||
         error.message.includes('Failed to fetch') ||
         error.message.includes('Network request failed') ||
         error.message.includes('fetch') ||
+        error.toString().includes('TypeError') ||
         !navigator.onLine;
 
       if (isNetworkError) {
