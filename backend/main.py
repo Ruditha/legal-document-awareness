@@ -1,12 +1,21 @@
 from fastapi import FastAPI, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import FileResponse # Still needed for potential static files if we add them later, but no audio serving now
+from starlette.responses import FileResponse
 import uvicorn
 import os
 import shutil
 from typing import List, Dict
+import logging
+from dotenv import load_dotenv
 
-# Import custom modules (TTS generation removed)
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Import custom modules
 from ocr import extract_text_from_image
 from nlp_processing import summarize_document, highlight_key_points, enhance_summary
 
