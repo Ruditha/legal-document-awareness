@@ -20,7 +20,8 @@ export default function App() {
   // - For physical Android device on same Wi-Fi: 'http://YOUR_LOCAL_IP_ADDRESS:8000'
   const backendUrl = 'http://localhost:8000';
 
-  // Check backend connectivity
+  // Check backend connectivity (commented out for demo mode)
+  /*
   const checkBackendHealth = async () => {
     try {
       const response = await fetch(`${backendUrl}/health`, {
@@ -32,6 +33,7 @@ export default function App() {
       return false;
     }
   };
+  */
   // Request camera and media library permissions
   const requestPermissions = async () => {
     if (Platform.OS !== 'web') {
