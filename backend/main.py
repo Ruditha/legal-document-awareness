@@ -47,6 +47,16 @@ app.add_middleware(
 
 # --- API Endpoints ---
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint to verify backend is running."""
+    return {
+        "status": "healthy",
+        "message": "Legal Awareness App Backend is running",
+        "llm_available": bool(os.getenv('GEMINI_API_KEY')),
+        "version": "2.0.0"
+    }
+
 @app.post("/process_document")
 async def process_document_endpoint(
     file: UploadFile,
