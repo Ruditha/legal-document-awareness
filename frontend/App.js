@@ -384,4 +384,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
+  demoIndicator: {
+    backgroundColor: '#ff9800',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  demoText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 });
