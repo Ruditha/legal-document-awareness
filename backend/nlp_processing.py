@@ -5,6 +5,14 @@ from transformers import pipeline
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from functools import lru_cache
+import os
+
+# Import LLM service for cloud-based analysis
+try:
+    from llm_service import get_llm_service
+    LLM_AVAILABLE = True
+except ImportError:
+    LLM_AVAILABLE = False
 
 # --- Constants ---
 # Words indicating legal actions/obligations/rights
