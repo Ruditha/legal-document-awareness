@@ -2,6 +2,8 @@
 
 Your Gemini API key is configured! Follow these steps to test the integration:
 
+<!-- Updated: LLM integration ready for testing -->
+
 ## ✅ Current Status
 - ✅ **API Key Configured**: AIzaSyAN3mtrO0hqxsUBKywOeVquBB59Dn-PxB8
 - ✅ **Backend Code**: Updated with LLM integration
