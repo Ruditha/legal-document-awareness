@@ -101,25 +101,16 @@ export default function App() {
     setKeyPoints([]);
     setIsDemoMode(false); // Reset demo mode before processing
 
-    const formData = new FormData();
-    formData.append('file', {
-      uri: imageUri,
-      name: `document.${imageUri.split('.').pop()}`,
-      type: `image/${imageUri.split('.').pop()}`,
-    });
-    // target_language parameter removed as multi-lingual output is out of scope for now
-    // formData.append('target_language', selectedLanguage); 
+    // DEMO MODE: Simulate document processing without any network calls
+    // In production, this would process the actual document via backend API
 
-    // Since backend is not available, activate demo mode immediately
-    // In a production environment, you would uncomment the fetch code below
-
-    // Simulate processing time for demo
+    // Simulate processing time for realistic demo experience
     setTimeout(() => {
       // Set demo mode
       setIsDemoMode(true);
 
-      // Provide a realistic mock response for demo purposes
-      setSummary('🔍 DEMO MODE: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
+      // Provide a comprehensive mock legal document analysis
+      setSummary('🔍 DEMO ANALYSIS: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
       setKeyPoints([
         '📋 Review all terms and conditions thoroughly',
         '🔄 Check for automatic renewal clauses that may bind you longer than intended',
@@ -128,13 +119,13 @@ export default function App() {
         '🔒 Ensure data privacy and confidentiality terms meet your standards',
         '⏰ Note any time-sensitive obligations or deadlines',
         '🔧 Review modification and amendment procedures',
-        '⚠️ This is demonstration content - connect the backend server for real document analysis'
+        '⚠️ This is demonstration content - no backend server required'
       ]);
 
       Alert.alert(
-        '🚀 Demo Mode Active',
-        'Backend server is not available. This demo shows how the app would work with real document analysis. \n\nTo enable full functionality, start the Python backend server on port 8000.',
-        [{ text: 'Continue with Demo', style: 'default' }]
+        '✅ Demo Analysis Complete',
+        'This demo shows how the app would analyze your legal document. The analysis includes key points and potential risks to review before signing.',
+        [{ text: 'Review Results', style: 'default' }]
       );
 
       setLoading(false);
