@@ -124,21 +124,26 @@ export default function App() {
         !navigator.onLine;
 
       if (isNetworkError) {
+        // Set demo mode
+        setIsDemoMode(true);
+
         // Provide a mock response for demo purposes when backend is not available
-        setSummary('Demo Mode: Backend server is not running. This is a mock legal document summary. In a real scenario, this would contain an AI-generated summary of the uploaded legal document highlighting important clauses, terms, and conditions that require attention before signing.');
+        setSummary('��� DEMO MODE: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
         setKeyPoints([
-          'Review all terms and conditions carefully',
-          'Check for automatic renewal clauses',
-          'Verify payment terms and cancellation policies',
-          'Look for liability and indemnification clauses',
-          'Ensure data privacy and confidentiality terms are acceptable',
-          'Note: This is demo content - connect to backend for real analysis'
+          '📋 Review all terms and conditions thoroughly',
+          '🔄 Check for automatic renewal clauses that may bind you longer than intended',
+          '💰 Verify payment terms, late fees, and cancellation policies',
+          '⚖️ Look for liability limitations and indemnification clauses',
+          '🔒 Ensure data privacy and confidentiality terms meet your standards',
+          '⏰ Note any time-sensitive obligations or deadlines',
+          '🔧 Review modification and amendment procedures',
+          '⚠️ This is demonstration content - connect the backend server for real document analysis'
         ]);
 
         Alert.alert(
-          'Demo Mode',
-          'Backend server is not running. Showing demo content. To enable full functionality, please ensure the Python backend is running on port 8000.',
-          [{ text: 'OK' }]
+          '🚀 Demo Mode Active',
+          'Backend server is not available. This demo shows how the app would work with real document analysis. \n\nTo enable full functionality, start the Python backend server on port 8000.',
+          [{ text: 'Continue with Demo', style: 'default' }]
         );
       } else {
         Alert.alert('Processing Error', error.message || 'An unexpected error occurred. Please try again.');
