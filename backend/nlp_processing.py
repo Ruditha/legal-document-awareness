@@ -254,6 +254,37 @@ LEGAL_KEYWORDS_SIMPLE_FOR_HIGHLIGHTING = [
     "unless", "except", "not limited to", "including but not limited to",
     "notwithstanding anything to the contrary", "without prejudice", "hereunder"
 ]
+def _create_enhanced_summary(text: str) -> str:
+    """
+    Create an enhanced summary using rule-based analysis when LLM is not available.
+    """
+    sentences = text.split('.')
+    important_sentences = []
+
+    # Look for sentences with legal importance indicators
+    importance_keywords = [
+        'party', 'parties', 'agreement', 'contract', 'obligation', 'shall', 'must',
+        'payment', 'term', 'termination', 'liability', 'breach', 'damages',
+        'intellectual property', 'confidential', 'dispute', 'governing law'
+    ]
+
+    for sentence in sentences[:50]:  # Analyze first 50 sentences
+        sentence = sentence.strip()
+        if len(sentence) > 30:  # Skip very short sentences
+            score = sum(1 for keyword in importance_keywords if keyword.lower() in sentence.lower())
+            if score >= 2:  # Sentence contains multiple important terms
+                important_sentences.append(sentence)
+                if len(important_sentences) >= 5:  # Limit to 5 key sentences
+                    break
+
+    if important_sentences:
+        summary = "This legal document contains the following key elements: " + ". ".join(important_sentences) + "."
+    else:
+        # Basic fallback
+        summary = f"Legal document analysis: {' '.join(text.split()[:150])}..."
+
+    return summary
+
 def enhance_summary(summary_text: str) -> str:
     """
     Adds simple markers to sentences in the summary that contain legal keywords.
@@ -262,7 +293,7 @@ def enhance_summary(summary_text: str) -> str:
     for sent in summary_text.split('.'):
         if not sent.strip():
             continue
-        
+
         found_keyword = False
         for keyword in LEGAL_KEYWORDS_SIMPLE_FOR_HIGHLIGHTING:
             if keyword in sent.lower():
@@ -271,5 +302,5 @@ def enhance_summary(summary_text: str) -> str:
                 break
         if not found_keyword:
             enhanced_sentences.append(sent.strip())
-            
+
     return '. '.join(enhanced_sentences) + ('.' if summary_text.endswith('.') else '')
