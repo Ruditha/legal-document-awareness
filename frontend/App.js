@@ -111,7 +111,28 @@ export default function App() {
 
     } catch (error) {
       console.error('Error processing document:', error);
-      Alert.alert('Processing Error', error.message || 'An unexpected error occurred. Please try again.');
+
+      // Check if this is a network error (backend not running)
+      if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+        // Provide a mock response for demo purposes when backend is not available
+        setSummary('Demo Mode: Backend server is not running. This is a mock legal document summary. In a real scenario, this would contain an AI-generated summary of the uploaded legal document highlighting important clauses, terms, and conditions that require attention before signing.');
+        setKeyPoints([
+          'Review all terms and conditions carefully',
+          'Check for automatic renewal clauses',
+          'Verify payment terms and cancellation policies',
+          'Look for liability and indemnification clauses',
+          'Ensure data privacy and confidentiality terms are acceptable',
+          'Note: This is demo content - connect to backend for real analysis'
+        ]);
+
+        Alert.alert(
+          'Demo Mode',
+          'Backend server is not running. Showing demo content. To enable full functionality, please ensure the Python backend is running on port 8000.',
+          [{ text: 'OK' }]
+        );
+      } else {
+        Alert.alert('Processing Error', error.message || 'An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
