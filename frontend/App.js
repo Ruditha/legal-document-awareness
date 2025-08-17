@@ -108,21 +108,46 @@ export default function App() {
     // target_language parameter removed as multi-lingual output is out of scope for now
     // formData.append('target_language', selectedLanguage); 
 
+    // Since backend is not available, activate demo mode immediately
+    // In a production environment, you would uncomment the fetch code below
+
+    // Simulate processing time for demo
+    setTimeout(() => {
+      // Set demo mode
+      setIsDemoMode(true);
+
+      // Provide a realistic mock response for demo purposes
+      setSummary('🔍 DEMO MODE: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
+      setKeyPoints([
+        '📋 Review all terms and conditions thoroughly',
+        '🔄 Check for automatic renewal clauses that may bind you longer than intended',
+        '💰 Verify payment terms, late fees, and cancellation policies',
+        '⚖️ Look for liability limitations and indemnification clauses',
+        '🔒 Ensure data privacy and confidentiality terms meet your standards',
+        '⏰ Note any time-sensitive obligations or deadlines',
+        '🔧 Review modification and amendment procedures',
+        '⚠️ This is demonstration content - connect the backend server for real document analysis'
+      ]);
+
+      Alert.alert(
+        '🚀 Demo Mode Active',
+        'Backend server is not available. This demo shows how the app would work with real document analysis. \n\nTo enable full functionality, start the Python backend server on port 8000.',
+        [{ text: 'Continue with Demo', style: 'default' }]
+      );
+
+      setLoading(false);
+    }, 2000); // 2 second delay to simulate processing
+
+    /*
+    // Uncomment this section when backend is available:
     try {
-      // First, try a quick health check
-      let response;
-      try {
-        response = await fetch(`${backendUrl}/process_document`, {
-          method: 'POST',
-          body: formData,
-          headers: {
-            // 'Authorization': 'Basic ' + btoa('user:password'), // Uncomment for basic auth if enabled in main.py
-          },
-        });
-      } catch (fetchError) {
-        // If fetch itself fails, immediately go to demo mode
-        throw new Error('NETWORK_ERROR');
-      }
+      const response = await fetch(`${backendUrl}/process_document`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          // 'Authorization': 'Basic ' + btoa('user:password'), // Uncomment for basic auth if enabled in main.py
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -135,47 +160,11 @@ export default function App() {
 
     } catch (error) {
       console.error('Error processing document:', error);
-
-      // Check if this is a network error (backend not running)
-      // Handle various types of network errors
-      const isNetworkError =
-        error.message === 'NETWORK_ERROR' ||
-        error.message === 'Failed to fetch' ||
-        error.name === 'TypeError' ||
-        error.message.includes('Failed to fetch') ||
-        error.message.includes('Network request failed') ||
-        error.message.includes('fetch') ||
-        error.toString().includes('TypeError') ||
-        !navigator.onLine;
-
-      if (isNetworkError) {
-        // Set demo mode
-        setIsDemoMode(true);
-
-        // Provide a mock response for demo purposes when backend is not available
-        setSummary('🔍 DEMO MODE: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
-        setKeyPoints([
-          '📋 Review all terms and conditions thoroughly',
-          '🔄 Check for automatic renewal clauses that may bind you longer than intended',
-          '💰 Verify payment terms, late fees, and cancellation policies',
-          '⚖️ Look for liability limitations and indemnification clauses',
-          '🔒 Ensure data privacy and confidentiality terms meet your standards',
-          '⏰ Note any time-sensitive obligations or deadlines',
-          '🔧 Review modification and amendment procedures',
-          '⚠️ This is demonstration content - connect the backend server for real document analysis'
-        ]);
-
-        Alert.alert(
-          '🚀 Demo Mode Active',
-          'Backend server is not available. This demo shows how the app would work with real document analysis. \n\nTo enable full functionality, start the Python backend server on port 8000.',
-          [{ text: 'Continue with Demo', style: 'default' }]
-        );
-      } else {
-        Alert.alert('Processing Error', error.message || 'An unexpected error occurred. Please try again.');
-      }
+      Alert.alert('Processing Error', error.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
+    */
   };
 
   // Audio playback function removed as per HOD's instruction
