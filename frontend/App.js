@@ -49,6 +49,7 @@ export default function App() {
       // Clear previous results when a new image is selected
       setSummary('');
       setKeyPoints([]);
+      setIsDemoMode(false); // Reset demo mode
     }
   };
 
