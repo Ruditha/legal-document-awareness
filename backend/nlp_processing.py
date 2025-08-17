@@ -85,20 +85,27 @@ target_phrase_embeddings = sbert_model.encode(TARGET_PHRASES)
 
 def summarize_document(text: str) -> str:
     """
-    Generates an abstractive summary of the given English text using BART.
+    Generates an abstractive summary of the given English text.
+    Uses LLM (Gemini) for enhanced legal document analysis, with local model fallback.
     """
-    # Adjust max_length and min_length based on desired summary length.
-    # For legal docs, a longer summary might be needed to retain critical info.
-    # Add a check for minimum text length to avoid errors with very short inputs.
-    if len(text.split()) < 50: # Example: require at least 50 words for summarization
+    if len(text.split()) < 50:
         return "Document too short to generate a meaningful summary."
 
+    # Try LLM service first (preferred method)
+    if LLM_AVAILABLE and os.getenv('GEMINI_API_KEY'):
+        try:
+            llm_service = get_llm_service()
+            return llm_service.summarize_document(text)
+        except Exception as e:
+            print(f"LLM summarization failed, using local fallback: {e}")
+
+    # Fallback to local BART model
     try:
         summary = summarizer(text, max_length=250, min_length=50, do_sample=False)
         return summary[0]['summary_text']
     except Exception as e:
-        print(f"Error during summarization: {e}")
-        # Fallback to first N words if model fails
+        print(f"Error during local summarization: {e}")
+        # Final fallback to text truncation
         return " ".join(text.split()[:150]) + "..."
 
 
