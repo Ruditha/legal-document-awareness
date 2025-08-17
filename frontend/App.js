@@ -181,6 +181,12 @@ export default function App() {
         </View>
       )}
 
+      {!isDemoMode && (
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>📄 Upload a legal document to get AI-powered analysis</Text>
+        </View>
+      )}
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={pickImage}>
           <Text style={styles.buttonText}>Pick from Gallery</Text>
