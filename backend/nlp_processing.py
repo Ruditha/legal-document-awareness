@@ -5,6 +5,14 @@ from transformers import pipeline
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from functools import lru_cache
+import os
+
+# Import LLM service for cloud-based analysis
+try:
+    from llm_service import get_llm_service
+    LLM_AVAILABLE = True
+except ImportError:
+    LLM_AVAILABLE = False
 
 # --- Constants ---
 # Words indicating legal actions/obligations/rights
@@ -77,29 +85,57 @@ target_phrase_embeddings = sbert_model.encode(TARGET_PHRASES)
 
 def summarize_document(text: str) -> str:
     """
-    Generates an abstractive summary of the given English text using BART.
+    Generates an abstractive summary of the given English text.
+    Uses LLM (Gemini) for enhanced legal document analysis, with local model fallback.
     """
-    # Adjust max_length and min_length based on desired summary length.
-    # For legal docs, a longer summary might be needed to retain critical info.
-    # Add a check for minimum text length to avoid errors with very short inputs.
-    if len(text.split()) < 50: # Example: require at least 50 words for summarization
+    if len(text.split()) < 50:
         return "Document too short to generate a meaningful summary."
 
+    # Try LLM service first (preferred method)
+    if LLM_AVAILABLE and os.getenv('GEMINI_API_KEY'):
+        try:
+            llm_service = get_llm_service()
+            return llm_service.summarize_document(text)
+        except Exception as e:
+            print(f"LLM summarization failed, using local fallback: {e}")
+
+    # Fallback to enhanced rule-based summary for testing
     try:
+        # Try local BART model if available
         summary = summarizer(text, max_length=250, min_length=50, do_sample=False)
         return summary[0]['summary_text']
     except Exception as e:
-        print(f"Error during summarization: {e}")
-        # Fallback to first N words if model fails
-        return " ".join(text.split()[:150]) + "..."
+        print(f"Local model unavailable, using enhanced fallback: {e}")
+        # Enhanced fallback with better legal document analysis
+        return _create_enhanced_summary(text)
 
 
 def highlight_key_points(text: str) -> List[Dict]:
     """
-    Combines rule-based dependency parsing and semantic similarity to extract
-    and highlight crucial legal clauses.
+    Extracts crucial legal clauses and key points.
+    Uses LLM (Gemini) for enhanced analysis, with local model fallback.
     Returns a list of dictionaries, each containing the clause text, type, and confidence.
     """
+
+    # Try LLM service first (preferred method)
+    if LLM_AVAILABLE and os.getenv('GEMINI_API_KEY'):
+        try:
+            llm_service = get_llm_service()
+            key_points_text = llm_service.extract_key_points(text)
+
+            # Convert to the expected format for compatibility
+            return [
+                {
+                    "text": point,
+                    "type": "llm_extracted",
+                    "confidence": 0.95
+                }
+                for point in key_points_text
+            ]
+        except Exception as e:
+            print(f"LLM key point extraction failed, using local fallback: {e}")
+
+    # Fallback to local rule-based and semantic analysis
     doc = nlp(text)
     all_clauses = []
 
@@ -218,6 +254,37 @@ LEGAL_KEYWORDS_SIMPLE_FOR_HIGHLIGHTING = [
     "unless", "except", "not limited to", "including but not limited to",
     "notwithstanding anything to the contrary", "without prejudice", "hereunder"
 ]
+def _create_enhanced_summary(text: str) -> str:
+    """
+    Create an enhanced summary using rule-based analysis when LLM is not available.
+    """
+    sentences = text.split('.')
+    important_sentences = []
+
+    # Look for sentences with legal importance indicators
+    importance_keywords = [
+        'party', 'parties', 'agreement', 'contract', 'obligation', 'shall', 'must',
+        'payment', 'term', 'termination', 'liability', 'breach', 'damages',
+        'intellectual property', 'confidential', 'dispute', 'governing law'
+    ]
+
+    for sentence in sentences[:50]:  # Analyze first 50 sentences
+        sentence = sentence.strip()
+        if len(sentence) > 30:  # Skip very short sentences
+            score = sum(1 for keyword in importance_keywords if keyword.lower() in sentence.lower())
+            if score >= 2:  # Sentence contains multiple important terms
+                important_sentences.append(sentence)
+                if len(important_sentences) >= 5:  # Limit to 5 key sentences
+                    break
+
+    if important_sentences:
+        summary = "This legal document contains the following key elements: " + ". ".join(important_sentences) + "."
+    else:
+        # Basic fallback
+        summary = f"Legal document analysis: {' '.join(text.split()[:150])}..."
+
+    return summary
+
 def enhance_summary(summary_text: str) -> str:
     """
     Adds simple markers to sentences in the summary that contain legal keywords.
@@ -226,7 +293,7 @@ def enhance_summary(summary_text: str) -> str:
     for sent in summary_text.split('.'):
         if not sent.strip():
             continue
-        
+
         found_keyword = False
         for keyword in LEGAL_KEYWORDS_SIMPLE_FOR_HIGHLIGHTING:
             if keyword in sent.lower():
@@ -235,5 +302,5 @@ def enhance_summary(summary_text: str) -> str:
                 break
         if not found_keyword:
             enhanced_sentences.append(sent.strip())
-            
+
     return '. '.join(enhanced_sentences) + ('.' if summary_text.endswith('.') else '')

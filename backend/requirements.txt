@@ -7,6 +7,10 @@ python-multipart==0.0.9
 opencv-python==4.9.0.80
 Pillow==10.3.0
 pytesseract==0.3.10
+# LLM Integration dependencies
+google-generativeai==0.3.2
+python-dotenv==1.0.0
+# Legacy local models (kept for fallback)
 transformers==4.42.3
 torch==2.3.1 # Required by transformers. Install with specific CUDA/CPU version if needed.
 spacy==3.7.4

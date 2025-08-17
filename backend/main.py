@@ -1,12 +1,21 @@
 from fastapi import FastAPI, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import FileResponse # Still needed for potential static files if we add them later, but no audio serving now
+from starlette.responses import FileResponse
 import uvicorn
 import os
 import shutil
 from typing import List, Dict
+import logging
+from dotenv import load_dotenv
 
-# Import custom modules (TTS generation removed)
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Import custom modules
 from ocr import extract_text_from_image
 from nlp_processing import summarize_document, highlight_key_points, enhance_summary
 
@@ -17,13 +26,16 @@ app = FastAPI(
 )
 
 # Configure CORS to allow frontend to connect
+# Get allowed origins from environment or use defaults
+allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:8081,http://10.0.2.2:8081,exp://localhost:8081').split(',')
 origins = [
     "http://localhost",
-    "http://localhost:8081", # Default for React Native development server
-    "exp://localhost:8081", # For Expo Go app
-    "http://10.0.2.2:8000", # For Android emulator to connect to host's localhost
-    # Add your deployed frontend URL here when available
-]
+    "http://localhost:3000",  # React development server
+    "http://localhost:8081",  # Expo development server
+    "exp://localhost:8081",   # Expo Go app
+    "http://10.0.2.2:8000",   # Android emulator to host
+    "http://10.0.2.2:8081",   # Android emulator to Expo
+] + allowed_origins
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,21 +47,43 @@ app.add_middleware(
 
 # --- API Endpoints ---
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint to verify backend is running."""
+    return {
+        "status": "healthy",
+        "message": "Legal Awareness App Backend is running",
+        "llm_available": bool(os.getenv('GEMINI_API_KEY')),
+        "version": "2.0.0"
+    }
+
 @app.post("/process_document")
 async def process_document_endpoint(
     file: UploadFile,
 ):
     """
-    Processes an uploaded legal document:
+    Processes an uploaded legal document using LLM-powered analysis:
     1. Extracts text using OCR.
-    2. Summarizes the English text.
-    3. Extracts and highlights crucial points in English.
+    2. Summarizes the document using Google Gemini (with local fallback).
+    3. Extracts and highlights crucial points using advanced LLM analysis.
     """
-    if not file.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp')):
-        raise HTTPException(status_code=400, detail="Only image files (PNG, JPG, JPEG, TIFF, BMP) are supported for OCR.")
+    logger.info(f"Processing document: {file.filename}")
 
-    if file.size > 5 * 1024 * 1024: # 5MB limit
-        raise HTTPException(status_code=400, detail="File too large. Maximum 5MB allowed.")
+    # Validate file type
+    allowed_extensions = tuple(os.getenv('ALLOWED_FILE_TYPES', 'png,jpg,jpeg,tiff,bmp').split(','))
+    if not file.filename.lower().endswith(allowed_extensions):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Only image files ({', '.join(allowed_extensions).upper()}) are supported for OCR."
+        )
+
+    # Validate file size
+    max_size = int(os.getenv('MAX_FILE_SIZE_MB', '5')) * 1024 * 1024
+    if file.size and file.size > max_size:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large. Maximum {max_size // (1024*1024)}MB allowed."
+        )
 
     # Save the uploaded file temporarily
     file_location = f"temp_{file.filename}"
@@ -89,9 +123,19 @@ async def process_document_endpoint(
             key_points_text_only = ["Could not extract specific key points."]
             print(f"Key point extraction failed: {e}")
 
+        # Add metadata about the analysis
+        analysis_metadata = {
+            "llm_used": bool(os.getenv('GEMINI_API_KEY')),
+            "ocr_success": True,
+            "processing_method": "LLM-enhanced" if os.getenv('GEMINI_API_KEY') else "Local models"
+        }
+
+        logger.info(f"Document processing completed successfully using {analysis_metadata['processing_method']}")
+
         return {
             "summary": enhanced_summary_en,
             "key_points": key_points_text_only,
+            "metadata": analysis_metadata
         }
 
     finally:
