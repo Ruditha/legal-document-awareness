@@ -128,7 +128,7 @@ export default function App() {
         setIsDemoMode(true);
 
         // Provide a mock response for demo purposes when backend is not available
-        setSummary('��� DEMO MODE: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
+        setSummary('🔍 DEMO MODE: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
         setKeyPoints([
           '📋 Review all terms and conditions thoroughly',
           '🔄 Check for automatic renewal clauses that may bind you longer than intended',
@@ -160,6 +160,12 @@ export default function App() {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Consent Before Signing</Text>
       <Text style={styles.subtitle}>Legal Awareness App</Text>
+
+      {isDemoMode && (
+        <View style={styles.demoIndicator}>
+          <Text style={styles.demoText}>🚀 DEMO MODE - Backend Offline</Text>
+        </View>
+      )}
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={pickImage}>
