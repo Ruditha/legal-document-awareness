@@ -123,9 +123,19 @@ async def process_document_endpoint(
             key_points_text_only = ["Could not extract specific key points."]
             print(f"Key point extraction failed: {e}")
 
+        # Add metadata about the analysis
+        analysis_metadata = {
+            "llm_used": bool(os.getenv('GEMINI_API_KEY')),
+            "ocr_success": True,
+            "processing_method": "LLM-enhanced" if os.getenv('GEMINI_API_KEY') else "Local models"
+        }
+
+        logger.info(f"Document processing completed successfully using {analysis_metadata['processing_method']}")
+
         return {
             "summary": enhanced_summary_en,
             "key_points": key_points_text_only,
+            "metadata": analysis_metadata
         }
 
     finally:
