@@ -26,13 +26,16 @@ app = FastAPI(
 )
 
 # Configure CORS to allow frontend to connect
+# Get allowed origins from environment or use defaults
+allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:8081,http://10.0.2.2:8081,exp://localhost:8081').split(',')
 origins = [
     "http://localhost",
-    "http://localhost:8081", # Default for React Native development server
-    "exp://localhost:8081", # For Expo Go app
-    "http://10.0.2.2:8000", # For Android emulator to connect to host's localhost
-    # Add your deployed frontend URL here when available
-]
+    "http://localhost:3000",  # React development server
+    "http://localhost:8081",  # Expo development server
+    "exp://localhost:8081",   # Expo Go app
+    "http://10.0.2.2:8000",   # Android emulator to host
+    "http://10.0.2.2:8081",   # Android emulator to Expo
+] + allowed_origins
 
 app.add_middleware(
     CORSMiddleware,
