@@ -113,7 +113,16 @@ export default function App() {
       console.error('Error processing document:', error);
 
       // Check if this is a network error (backend not running)
-      if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+      // Handle various types of network errors
+      const isNetworkError =
+        error.message === 'Failed to fetch' ||
+        error.name === 'TypeError' ||
+        error.message.includes('Failed to fetch') ||
+        error.message.includes('Network request failed') ||
+        error.message.includes('fetch') ||
+        !navigator.onLine;
+
+      if (isNetworkError) {
         // Provide a mock response for demo purposes when backend is not available
         setSummary('Demo Mode: Backend server is not running. This is a mock legal document summary. In a real scenario, this would contain an AI-generated summary of the uploaded legal document highlighting important clauses, terms, and conditions that require attention before signing.');
         setKeyPoints([
