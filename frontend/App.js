@@ -84,6 +84,7 @@ export default function App() {
     setLoading(true);
     setSummary('');
     setKeyPoints([]);
+    setIsDemoMode(false); // Reset demo mode before processing
 
     const formData = new FormData();
     formData.append('file', {
@@ -130,7 +131,7 @@ export default function App() {
         setIsDemoMode(true);
 
         // Provide a mock response for demo purposes when backend is not available
-        setSummary('���� DEMO MODE: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
+        setSummary('🔍 DEMO MODE: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
         setKeyPoints([
           '📋 Review all terms and conditions thoroughly',
           '🔄 Check for automatic renewal clauses that may bind you longer than intended',
