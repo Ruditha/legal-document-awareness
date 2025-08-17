@@ -111,10 +111,30 @@ def summarize_document(text: str) -> str:
 
 def highlight_key_points(text: str) -> List[Dict]:
     """
-    Combines rule-based dependency parsing and semantic similarity to extract
-    and highlight crucial legal clauses.
+    Extracts crucial legal clauses and key points.
+    Uses LLM (Gemini) for enhanced analysis, with local model fallback.
     Returns a list of dictionaries, each containing the clause text, type, and confidence.
     """
+
+    # Try LLM service first (preferred method)
+    if LLM_AVAILABLE and os.getenv('GEMINI_API_KEY'):
+        try:
+            llm_service = get_llm_service()
+            key_points_text = llm_service.extract_key_points(text)
+
+            # Convert to the expected format for compatibility
+            return [
+                {
+                    "text": point,
+                    "type": "llm_extracted",
+                    "confidence": 0.95
+                }
+                for point in key_points_text
+            ]
+        except Exception as e:
+            print(f"LLM key point extraction failed, using local fallback: {e}")
+
+    # Fallback to local rule-based and semantic analysis
     doc = nlp(text)
     all_clauses = []
 
