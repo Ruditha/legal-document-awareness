@@ -62,16 +62,28 @@ async def process_document_endpoint(
     file: UploadFile,
 ):
     """
-    Processes an uploaded legal document:
+    Processes an uploaded legal document using LLM-powered analysis:
     1. Extracts text using OCR.
-    2. Summarizes the English text.
-    3. Extracts and highlights crucial points in English.
+    2. Summarizes the document using Google Gemini (with local fallback).
+    3. Extracts and highlights crucial points using advanced LLM analysis.
     """
-    if not file.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp')):
-        raise HTTPException(status_code=400, detail="Only image files (PNG, JPG, JPEG, TIFF, BMP) are supported for OCR.")
+    logger.info(f"Processing document: {file.filename}")
 
-    if file.size > 5 * 1024 * 1024: # 5MB limit
-        raise HTTPException(status_code=400, detail="File too large. Maximum 5MB allowed.")
+    # Validate file type
+    allowed_extensions = tuple(os.getenv('ALLOWED_FILE_TYPES', 'png,jpg,jpeg,tiff,bmp').split(','))
+    if not file.filename.lower().endswith(allowed_extensions):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Only image files ({', '.join(allowed_extensions).upper()}) are supported for OCR."
+        )
+
+    # Validate file size
+    max_size = int(os.getenv('MAX_FILE_SIZE_MB', '5')) * 1024 * 1024
+    if file.size and file.size > max_size:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large. Maximum {max_size // (1024*1024)}MB allowed."
+        )
 
     # Save the uploaded file temporarily
     file_location = f"temp_{file.filename}"
