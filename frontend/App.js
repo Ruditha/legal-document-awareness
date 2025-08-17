@@ -14,11 +14,8 @@ export default function App() {
   const [imageUri, setImageUri] = useState(null); // To display selected image
   const [isDemoMode, setIsDemoMode] = useState(false); // Track if we're in demo mode
 
-  // Adjust backendUrl based on your setup:
-  // - For Android emulator: 'http://10.0.2.2:8000' (connects to host's localhost)
-  // - For iOS simulator/device: 'http://localhost:8000' (if running on same machine)
-  // - For physical Android device on same Wi-Fi: 'http://YOUR_LOCAL_IP_ADDRESS:8000'
-  const backendUrl = 'http://localhost:8000';
+  // Backend URL configuration for different platforms
+  const backendUrl = Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
 
   // Check backend connectivity (commented out for demo mode)
   /*
