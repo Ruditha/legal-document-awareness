@@ -98,35 +98,79 @@ export default function App() {
     setKeyPoints([]);
     setIsDemoMode(false); // Reset demo mode before processing
 
-    // DEMO MODE: Simulate document processing without any network calls
-    // In production, this would process the actual document via backend API
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('file', {
+      uri: imageUri,
+      name: `document.${imageUri.split('.').pop()}`,
+      type: `image/${imageUri.split('.').pop()}`,
+    });
 
-    // Simulate processing time for realistic demo experience
-    setTimeout(() => {
-      // Set demo mode
-      setIsDemoMode(true);
+    try {
+      // Call the backend API
+      const response = await fetch(`${backendUrl}/process_document`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-      // Provide a comprehensive mock legal document analysis
-      setSummary('🔍 DEMO ANALYSIS: This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
-      setKeyPoints([
-        '📋 Review all terms and conditions thoroughly',
-        '🔄 Check for automatic renewal clauses that may bind you longer than intended',
-        '💰 Verify payment terms, late fees, and cancellation policies',
-        '⚖️ Look for liability limitations and indemnification clauses',
-        '🔒 Ensure data privacy and confidentiality terms meet your standards',
-        '⏰ Note any time-sensitive obligations or deadlines',
-        '🔧 Review modification and amendment procedures',
-        '⚠️ This is demonstration content - no backend server required'
-      ]);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to process document.');
+      }
 
+      const data = await response.json();
+
+      // Set the results from the LLM analysis
+      setSummary(data.summary);
+      setKeyPoints(data.key_points);
+
+      // Show success message
       Alert.alert(
-        '✅ Demo Analysis Complete',
-        'This demo shows how the app would analyze your legal document. The analysis includes key points and potential risks to review before signing.',
+        '✅ Analysis Complete',
+        `Document analyzed successfully using ${data.metadata?.processing_method || 'AI'}. Review the summary and key points below.`,
         [{ text: 'Review Results', style: 'default' }]
       );
 
+    } catch (error) {
+      console.error('Error processing document:', error);
+
+      // Check if this is a network error (backend not running)
+      const isNetworkError =
+        error.message === 'Failed to fetch' ||
+        error.name === 'TypeError' ||
+        error.message.includes('Failed to fetch') ||
+        error.message.includes('Network request failed') ||
+        error.message.includes('fetch') ||
+        !navigator.onLine;
+
+      if (isNetworkError) {
+        // Activate demo mode as fallback
+        setIsDemoMode(true);
+        setSummary('🔍 DEMO MODE: Backend server is not available. This is a simulated legal document analysis. In a real deployment, this would contain an AI-powered summary of your uploaded document, highlighting critical clauses, obligations, and potential risks that require your attention before signing any agreement.');
+        setKeyPoints([
+          '📋 Review all terms and conditions thoroughly',
+          '🔄 Check for automatic renewal clauses that may bind you longer than intended',
+          '💰 Verify payment terms, late fees, and cancellation policies',
+          '⚖️ Look for liability limitations and indemnification clauses',
+          '🔒 Ensure data privacy and confidentiality terms meet your standards',
+          '⏰ Note any time-sensitive obligations or deadlines',
+          '⚠️ Demo mode - backend server not available'
+        ]);
+
+        Alert.alert(
+          '⚠️ Connection Error',
+          'Cannot connect to backend server. Showing demo content. Please ensure the backend server is running on port 8000.',
+          [{ text: 'Continue with Demo', style: 'default' }]
+        );
+      } else {
+        Alert.alert('Processing Error', error.message || 'An unexpected error occurred. Please try again.');
+      }
+    } finally {
       setLoading(false);
-    }, 2000); // 2 second delay to simulate processing
+    }
 
     /*
     // Uncomment this section when backend is available:
