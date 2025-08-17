@@ -17,7 +17,7 @@ export default function App() {
   // - For Android emulator: 'http://10.0.2.2:8000' (connects to host's localhost)
   // - For iOS simulator/device: 'http://localhost:8000' (if running on same machine)
   // - For physical Android device on same Wi-Fi: 'http://YOUR_LOCAL_IP_ADDRESS:8000'
-  const backendUrl = 'http://192.168.1.37:8000';
+  const backendUrl = 'http://localhost:8000';
   // Request camera and media library permissions
   const requestPermissions = async () => {
     if (Platform.OS !== 'web') {
