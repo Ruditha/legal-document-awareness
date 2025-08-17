@@ -206,23 +206,18 @@ export default function App() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Always show demo banner for clarity */}
-      <View style={styles.permanentDemoIndicator}>
-        <Text style={styles.permanentDemoText}>🚀 DEMO VERSION - No Backend Required</Text>
-      </View>
-
       <Text style={styles.title}>Consent Before Signing</Text>
-      <Text style={styles.subtitle}>Legal Awareness App</Text>
+      <Text style={styles.subtitle}>Legal Awareness App - LLM Powered</Text>
 
       {isDemoMode && (
         <View style={styles.demoIndicator}>
-          <Text style={styles.demoText}>✅ Demo Analysis Complete</Text>
+          <Text style={styles.demoText}>⚠️ Demo Mode - Backend Offline</Text>
         </View>
       )}
 
       {!isDemoMode && (
         <View style={styles.infoBox}>
-          <Text style={styles.infoText}>📄 Upload a legal document to see demo analysis</Text>
+          <Text style={styles.infoText}>📄 Upload a legal document for AI-powered analysis</Text>
         </View>
       )}
 
